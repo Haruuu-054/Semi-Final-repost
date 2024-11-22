@@ -20,10 +20,10 @@ app.use(cors())
 app.use(express.json());
 //connection to mysql
 const connection = mysql.createConnection({
-    host: 'b34xi2cohy3ceo7mgxwm-mysql.services.clever-cloud.com',
-    user: 'u0dri0y8ahx8khs0',
-    password: 'Bq40nFSpvc3FVdb4BPYh',
-    database: 'b34xi2cohy3ceo7mgxwm',
+    host: 'bxvhslvlblmily3wzuea-mysql.services.clever-cloud.com',
+    user: 'uu63zptjdrshoqw1',
+    password: 'UyflJ8eoTdhVOYs9WFes',
+    database: 'bxvhslvlblmily3wzuea',
 });
 //initilization of connection
 connection.connect();
