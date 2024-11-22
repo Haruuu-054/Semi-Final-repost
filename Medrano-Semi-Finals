@@ -8,7 +8,7 @@ const moment = require('moment')
 const mysql = require('mysql')
 const cors = requires('cors')
 //port number
-const PORT = process.env.PORT || 1001;
+const PORT = process.env.PORT || 5000;
 
 const logger = (req, res, next) => {
     console.log(`${req.protocol}://${req.get('host')}${req.originalUrl} : ${moment().format()}`)
@@ -30,9 +30,9 @@ connection.connect();
 
 //API
 //get request and response are the parameters
-app.get("/api/employee", (req, res) => {
+app.get("/api/products", (req, res) => {
     //create querry
-    connection.query("SELECT * FROM userdata", (err, rows, fields)=>{
+    connection.query("SELECT * FROM product_info", (err, rows, fields)=>{
         //checking error
         if(err) throw err;
         //response
@@ -43,9 +43,9 @@ app.get("/api/employee", (req, res) => {
 
 //API
 //passing the id parameter
-app.get("/api/employee/:id", (req, res) => {
+app.get("/api/product_info/:product-id", (req, res) => {
     const id=req.params.id;
-    connection.query(`SELECT * FROM userdata WHERE id ='${id}'` , (err, rows, fields) => {
+    connection.query(`SELECT * FROM product_info WHERE product-id ='${id}'` , (err, rows, fields) => {
         if (err) throw err;
 
         if(rows.lenght > 0){
@@ -57,56 +57,6 @@ app.get("/api/employee/:id", (req, res) => {
     //res.send(id);
 
 })
-
-//Post
-app.use(express.urlencoded({extended: false}))
-app.post("/api/employee", (req, res) => { 
-
-    const fname = req.body.fname;
-    const lname = req.body.lname;
-    const email = req.body.email;
-    const gender = req.body.gender;
-
-    connection.query(`INSERT INTO userdata (first_name, last_name, email, gender) VALUE ('${fname}', '${lname}', '${email}','${gender}')`, (err, rows, fields) => {
-        if (err) throw err;
-        res.json({msg:`Successfully Inserted!`});
-    })
-
-
-})
-
-//CRUD
-//API
-//PUT - UPDATE
-app.use(express.urlencoded({extended: false}))
-app.put("/api/employee", (req, res) => {
-
-    const fname = req.body.fname;
-    const lname = req.body.lname;
-    const email = req.body.email;
-    const gender = req.body.gender;
-    const id = req.body.id;
-
-    connection.query(`UPDATE userdata SET first_name = '${fname}', last_name = '${lname}', email = '${email}',  gender = '${gender}' WHERE id = '${id}'`, (err, rows, fields) => {
-        if(err) throw err;
-        res.json({msg:`Successfully updated`});
-    })
-
-
-})
-
-//delete api
-app.use(express.urlencoded({extended: false}));
-app.delete("/api/employee", (req, res) => {
-    const id = req.body.id;
-    connection.query(`DELETE FROM userdata WHERE id = '${id}'`, (err, rows, fields) => {
-        if(err) throw err;
-        res.json({msg: `Successfully deleted`});
-    })
-
-
-})
-
 
 app.listen(1001, () => {
     console.log(`Server is running on ${PORT}`);
