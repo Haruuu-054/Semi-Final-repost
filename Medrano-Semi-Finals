@@ -1,63 +1,72 @@
-//instantiation
-//import express
-const express = require('express')
-const app = express()
-const moment = require('moment')
+// Import required modules
+const express = require('express');
+const app = express();
+const moment = require('moment');
+const mysql = require('mysql');
+const cors = require('cors');
 
-//importing mysql
-const mysql = require('mysql')
-const cors = requires('cors')
-//port number
+// Port number
 const PORT = process.env.PORT || 5000;
 
+// Logger middleware
 const logger = (req, res, next) => {
-    console.log(`${req.protocol}://${req.get('host')}${req.originalUrl} : ${moment().format()}`)
-    next()
-}
+    console.log(`${req.protocol}://${req.get('host')}${req.originalUrl} : ${moment().format()}`);
+    next();
+};
 
-app.use(logger)
-app.use(cors())
+// Middleware
+app.use(logger);
+app.use(cors());
 app.use(express.json());
-//connection to mysql
+
+// MySQL connection configuration
 const connection = mysql.createConnection({
     host: 'bxvhslvlblmily3wzuea-mysql.services.clever-cloud.com',
     user: 'uu63zptjdrshoqw1',
     password: 'UyflJ8eoTdhVOYs9WFes',
     database: 'bxvhslvlblmily3wzuea',
 });
-//initilization of connection
-connection.connect();
 
-//API
-//get request and response are the parameters
+// Initialize connection
+connection.connect((err) => {
+    if (err) {
+        console.error('Error connecting to MySQL:', err);
+        return;
+    }
+    console.log('Connected to MySQL database.');
+});
+
+// API: Get all products
 app.get("/api/products", (req, res) => {
-    //create querry
-    connection.query("SELECT * FROM product_info", (err, rows, fields)=>{
-        //checking error
-        if(err) throw err;
-        //response
-        //key value pair
-        res.json(rows);
-    })
-})
-
-//API
-//passing the id parameter
-app.get("/api/product_info/:product-id", (req, res) => {
-    const id=req.params.id;
-    connection.query(`SELECT * FROM product_info WHERE product-id ='${id}'` , (err, rows, fields) => {
-        if (err) throw err;
-
-        if(rows.lenght > 0){
-            res.json(rows);
-        }else{
-            res.status(400).json({msg:`${id} id not found!`});
+    const query = "SELECT * FROM product_info";
+    connection.query(query, (err, rows) => {
+        if (err) {
+            console.error('Error fetching products:', err);
+            return res.status(500).json({ error: 'Failed to fetch products.' });
         }
-    } )
-    //res.send(id);
+        res.json(rows);
+    });
+});
 
-})
+// API: Get a product by ID
+app.get("/api/product_info/:product_id", (req, res) => {
+    const id = req.params.product_id;
+    const query = "SELECT * FROM product_info WHERE product_id = ?";
+    connection.query(query, [id], (err, rows) => {
+        if (err) {
+            console.error('Error fetching product:', err);
+            return res.status(500).json({ error: 'Failed to fetch product.' });
+        }
 
-app.listen(5000, () => {
-    console.log(`Server is running on ${PORT}`);
-})
+        if (rows.length > 0) {
+            res.json(rows[0]);
+        } else {
+            res.status(404).json({ msg: `Product with ID ${id} not found.` });
+        }
+    });
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
